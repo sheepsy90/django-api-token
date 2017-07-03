@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import datetime
@@ -14,12 +15,16 @@ def token(request):
     """ The method to retrieve an API token to call further endpoints"""
 
     # Some validation (This could be a bit better in explicitly telling what error it was)
-
     if request.method != 'POST':
         return JsonResponse({'error': 'This endpoint only allows POST requests.'}, status=415)
 
-    username = request.POST.get('username')
-    password = request.POST.get('password')
+    if request.content_type == 'application/json':
+        json_data = json.loads(request.body)
+        username = json_data.get('username')
+        password = json_data.get('password')
+    else:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
     if not username:
         return JsonResponse({'error': 'You need to provide an attribute username with a value'}, status=409)
